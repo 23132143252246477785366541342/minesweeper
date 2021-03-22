@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+  <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  <head>
+    <style>
+      * {
+        background-color: #282c34;
+      }
+
+      button {
+        background-color: black;
+        border: none;
+        color: white;
+        padding: 15px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 24px;
+        margin: 2px 2px;
+        cursor: crosshair;
+        outline: none;
+        caret-color: white;
+        user-select: none;
+      }
+
+      ul {
+        cursor: crosshair;
+        list-style-type: none;
+        margin: auto;
+        caret-color: white;
+      }
+
+      #sad {
+        transform: scale(0.22);
+        margin: -450px;
+        position: absolute;
+        bottom: 640px;
+        right: 310px;
+        cursor: pointer;
+      }
+
+      #smile{
+        transform: scale(0.10);
+        margin: -450px;
+        position: absolute;
+        bottom: 540px;
+        right: 200px;
+        cursor: pointer;
+      }
+
+      .bombs{
+        height: 20px;
+        margin-right: -3.5px;
+        margin-left: -3.5px;
+      }
+
+      #bomb{
+        height: 100px;
+        position: absolute;
+        cursor: crosshair;
+        right: 215px;
+
+        animation: bomb infinite 20s linear;
+      }
+      @keyframes bomb {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      h1 {
+        font-family: Arial, Helvetica, sans-serif;
+        position: absolute;
+        right: 87px;
+        font-size: 100px;
+      }
+      #container {
+        height: 100vh; /* Magic here */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .flag {
+        height: 20px;
+        margin-right: -3.5px;
+        margin-left: -3.5px;
+      }
+    </style>
+  </head>
+  <body>
+  
+    <div id="mydiv"></div>
+
+    <script type="text/babel">
+      class Main extends React.Component { 
+        constructor(props) {
+          super(props);
+          this.state = {grid: this.newGrid(), num: 10, lost: false};
+          this.reset = this.reset.bind(this)
+          this.gridHandler = this.gridHandler.bind(this)
+          this.recursiveZero = this.recursiveZero.bind(this)
+          this.rightHandle = this.rightHandle.bind(this)
+        }
+
+        recursiveZero(zero) {
+          let a = this.state.grid
+          a[zero[0]][zero[1]].selected = true
+          if (typeof this.state.grid[zero[0] - 1] !== "undefined") {
+
+            if (typeof a[zero[0] - 1][zero[1]] !== "undefined" && a[zero[0] - 1][zero[1]].selected === false) {
+              a[zero[0] - 1][zero[1]].selected = true
+              this.setState({grid: a})
+              if (a[zero[0] - 1][zero[1]].number === 0) {
+                this.recursiveZero([zero[0]-1, zero[1]])
+              }
+            }
+
+            if (typeof a[zero[0] - 1][zero[1] - 1] !== "undefined" && a[zero[0] - 1][zero[1] - 1].selected === false) {
+              a[zero[0] - 1][zero[1] - 1].selected = true
+              this.setState({grid: a})
+              if (a[zero[0] - 1][zero[1] - 1].number === 0) {
+                this.recursiveZero([zero[0]-1, zero[1]-1])
+              }
+            }
+
+            if (typeof a[zero[0] - 1][zero[1] + 1] !== "undefined" && a[zero[0] - 1][zero[1] + 1].selected === false) {
+              a[zero[0] - 1][zero[1] + 1].selected = true
+              this.setState({grid: a})
+              if (a[zero[0] - 1][zero[1] + 1].number === 0){
+                this.recursiveZero([zero[0]-1, zero[1] + 1])
+              }        
+            }
+
+
+          }
+          if (typeof this.state.grid[zero[0] + 1] !== "undefined") {
+
+            if (typeof a[zero[0] + 1][zero[1]] !== "undefined" && a[zero[0] + 1][zero[1]].selected === false) {
+              a[zero[0] + 1][zero[1]].selected = true
+              this.setState({grid: a})
+              if (a[zero[0] + 1][zero[1]].number === 0) {
+                this.recursiveZero([zero[0]+1, zero[1]])
+              }
+            }
+
+            if (typeof a[zero[0] + 1][zero[1] - 1] !== "undefined" && a[zero[0] + 1][zero[1] - 1].selected === false) {
+              a[zero[0] + 1][zero[1] - 1].selected = true
+              this.setState({grid: a})
+              if (a[zero[0] + 1][zero[1] - 1].number === 0) {
+                this.recursiveZero([zero[0]+1, zero[1]-1])
+              }
+            }
+
+            if (typeof a[zero[0] + 1][zero[1] + 1] !== "undefined" && a[zero[0] + 1][zero[1] + 1].selected === false) {
+              a[zero[0] + 1][zero[1] + 1].selected = true
+              this.setState({grid: a})
+              if (a[zero[0] + 1][zero[1] + 1].number === 0){
+                this.recursiveZero([zero[0]+1, zero[1] + 1])
+              }        
+            }
+          }
+
+
+          if (typeof a[zero[0]][zero[1] - 1] !== "undefined" && a[zero[0]][zero[1] - 1].selected === false) {
+            a[zero[0]][zero[1] - 1].selected = true
+            this.setState({grid: a})
+            if (a[zero[0]][zero[1] - 1].number === 0) {
+              this.recursiveZero([zero[0], zero[1]-1])
+            }
+          }
+
+
+          if (typeof a[zero[0]][zero[1] + 1] !== "undefined" && a[zero[0]][zero[1] + 1].selected === false) {
+            a[zero[0]][zero[1] + 1].selected = true
+            this.setState({grid: a})
+            if (a[zero[0]][zero[1] + 1].number === 0){
+              this.recursiveZero([zero[0], zero[1] + 1])
+            }        
+          }
+          this.setState({grid: a})
+        }
+
+        gridHandler(item) {
+          let a = this.state.grid
+          a[item.row][item.column].selected = true
+          this.setState({ grid: a })
+          if (a[item.row][item.column].number === "b") {
+            this.setState({ lost: true })
+          }
+          if (a[item.row][item.column].number === 0) {
+            this.recursiveZero([[item.row][item.column]])
+          }
+        }
+
+        reset() {
+          this.setState({ grid: this.newGrid(), num: 10})
+          if (this.state.lost === true) {
+            this.setState({ lost: false })
+          }
+        }
+
+        rightHandle(item) {
+          let a = this.state.grid
+          if (this.state.num !== 0 && a[item.row][item.column].flagged === false && a[item.row][item.column].selected === false) {
+            a[item.row][item.column].selected = true;
+            if (a[item.row][item.column].number !== "b") {
+              a[item.row][item.column].falseFlagged = true;
+            }
+            a[item.row][item.column].number = <img alt="flag" src="https://i.imgur.com/Un7i4HY.png" className="flag"/>
+            this.setState({ num: this.state.num - 1 })
+            a[item.row][item.column].flagged = true;
+          }
+          this.setState({ grid: a })
+
+        }
+
+        render() {
+          return (
+            <div id="container">
+              {this.state.lost ? <img id ="sad" onClick={this.reset} alt= "sad-face" src="https://i.imgur.com/OyELxhL.png"/>:<img id ="smile" onClick={this.reset} alt= "smiley-face" src="https://imgur.com/ew2Q0zf.png"/>}
+              <img id= "bomb" alt="num-of-bombs" src="https://i.imgur.com/poKiHvg.png"/>
+              <h1>{this.state.num}</h1>
+              <ul onContextMenu={(e) => e.preventDefault()}>
+                {this.state.grid.map(item => <li><button disabled={this.state.lost} onContextMenu={() => this.rightHandle(item[0])} onClick={() => item[0].number === 0 ? this.recursiveZero([item[0].row, item[0].column]) : this.gridHandler(item[0])}>{item[0].selected ? item[0].number === "b" ? <img alt="b" src="https://i.imgur.com/G3CaKGj.png" className="bombs"/> : item[0].number : String.fromCharCode(160) + String.fromCharCode(160)}</button>
+                                                 <button disabled={this.state.lost} onContextMenu={() => this.rightHandle(item[1])} onClick={() => item[1].number === 0 ? this.recursiveZero([item[1].row, item[1].column]) : this.gridHandler(item[1])}>{item[1].selected ? item[1].number === "b" ? <img alt="b" src="https://i.imgur.com/G3CaKGj.png" className="bombs"/> : item[1].number : String.fromCharCode(160) + String.fromCharCode(160)}</button>
+                                                 <button disabled={this.state.lost} onContextMenu={() => this.rightHandle(item[2])} onClick={() => item[2].number === 0 ? this.recursiveZero([item[2].row, item[2].column]) : this.gridHandler(item[2])}>{item[2].selected ? item[2].number === "b" ? <img alt="b" src="https://i.imgur.com/G3CaKGj.png" className="bombs"/> : item[2].number : String.fromCharCode(160) + String.fromCharCode(160)}</button>
+                                                 <button disabled={this.state.lost} onContextMenu={() => this.rightHandle(item[3])} onClick={() => item[3].number === 0 ? this.recursiveZero([item[3].row, item[3].column]) : this.gridHandler(item[3])}>{item[3].selected ? item[3].number === "b" ? <img alt="b" src="https://i.imgur.com/G3CaKGj.png" className="bombs"/> : item[3].number : String.fromCharCode(160) + String.fromCharCode(160)}</button>
+                                                 <button disabled={this.state.lost} onContextMenu={() => this.rightHandle(item[4])} onClick={() => item[4].number === 0 ? this.recursiveZero([item[4].row, item[4].column]) : this.gridHandler(item[4])}>{item[4].selected ? item[4].number === "b" ? <img alt="b" src="https://i.imgur.com/G3CaKGj.png" className="bombs"/> : item[4].number : String.fromCharCode(160) + String.fromCharCode(160)}</button>
+                                                 <button disabled={this.state.lost} onContextMenu={() => this.rightHandle(item[5])} onClick={() => item[5].number === 0 ? this.recursiveZero([item[5].row, item[5].column]) : this.gridHandler(item[5])}>{item[5].selected ? item[5].number === "b" ? <img alt="b" src="https://i.imgur.com/G3CaKGj.png" className="bombs"/> : item[5].number : String.fromCharCode(160) + String.fromCharCode(160)}</button>
+                                                 <button disabled={this.state.lost} onContextMenu={() => this.rightHandle(item[6])} onClick={() => item[6].number === 0 ? this.recursiveZero([item[6].row, item[6].column]) : this.gridHandler(item[6])}>{item[6].selected ? item[6].number === "b" ? <img alt="b" src="https://i.imgur.com/G3CaKGj.png" className="bombs"/> : item[6].number : String.fromCharCode(160) + String.fromCharCode(160)}</button>
+                                                 <button disabled={this.state.lost} onContextMenu={() => this.rightHandle(item[7])} onClick={() => item[7].number === 0 ? this.recursiveZero([item[7].row, item[7].column]) : this.gridHandler(item[7])}>{item[7].selected ? item[7].number === "b" ? <img alt="b" src="https://i.imgur.com/G3CaKGj.png" className="bombs"/> : item[7].number : String.fromCharCode(160) + String.fromCharCode(160)}</button>
+                                                 <button disabled={this.state.lost} onContextMenu={() => this.rightHandle(item[8])} onClick={() => item[8].number === 0 ? this.recursiveZero([item[8].row, item[8].column]) : this.gridHandler(item[8])}>{item[8].selected ? item[8].number === "b" ? <img alt="b" src="https://i.imgur.com/G3CaKGj.png" className="bombs"/> : item[8].number : String.fromCharCode(160) + String.fromCharCode(160)}</button>
+                                                 <button disabled={this.state.lost} onContextMenu={() => this.rightHandle(item[9])} onClick={() => item[9].number === 0 ? this.recursiveZero([item[9].row, item[9].column]) : this.gridHandler(item[9])}>{item[9].selected ? item[9].number === "b" ? <img alt="b" src="https://i.imgur.com/G3CaKGj.png" className="bombs"/> : item[9].number : String.fromCharCode(160) + String.fromCharCode(160)}</button>
+                                                 </li>)}
+              </ul>
+            </div>
+          );
+        }
+
+        newGrid () {
+          console.log("\n\n\n\n\n\n\n")
+          let bombs = [];
+
+          for (let i = 0; i < 10; i++) {
+            let b = (Math.floor(Math.random() * 100) / 10).toString().split(".").map(item => parseInt(item))
+            if (b.length === 1) {b.push(0)}
+            while (true) {
+              console.log(bombs)
+              console.log(b)
+              if (!bombs.includes(b)) {
+                bombs.push([parseInt(b[0]), b[1] ? parseInt(b[1]) : 0])
+                break;
+
+              }
+              b = (Math.floor(Math.random() * 100) / 10).toString().split(".").map(item => parseInt(item))
+              if (b.length === 1) {b.push(0)}
+            }
+          }
+
+
+          let hidden = []
+
+          for (let i =0; i < 10; i++) {
+            hidden.push([0,0,0,0,0,0,0,0,0,0])
+          }
+          for (let i of bombs) {
+            hidden[i[0]][i[1]] = "b"
+            if (typeof hidden[i[0] - 1] !== "undefined") {
+              if (typeof hidden[i[0] - 1][i[1]] !== "string") {
+                hidden[i[0] - 1][i[1]] += 1
+              }
+              if (typeof hidden[i[0] - 1][i[1] - 1] !== "string" && typeof hidden[i[0] - 1][i[1] - 1] !== "undefined") {
+                hidden[i[0] - 1][i[1] - 1] += 1
+              }
+              if (typeof hidden[i[0] - 1][i[1] + 1] !== "string" && typeof hidden[i[0] - 1][i[1] + 1] !== "undefined") {
+                hidden[i[0] - 1][i[1] + 1] += 1
+              }
+            }
+            if (typeof hidden[i[0] + 1] !== "undefined") {
+              if (typeof hidden[i[0] + 1][i[1]] !== "string") {
+                hidden[i[0] + 1][i[1]] += 1
+              }
+              if (typeof hidden[i[0] + 1][i[1] - 1] !== "string" && typeof hidden[i[0] + 1][i[1] - 1] !== "undefined") {
+                hidden[i[0] + 1][i[1] - 1] += 1
+              }
+              if (typeof hidden[i[0] + 1][i[1] + 1] !== "string" && typeof hidden[i[0] + 1][i[1] + 1] !== "undefined") {
+                hidden[i[0] + 1][i[1] + 1] += 1
+              }
+            }
+            if (typeof hidden[i[0]][i[1] - 1] !== "undefined" && typeof hidden[i[0]][i[1] - 1] !== "string") {
+              hidden[i[0]][i[1] - 1] += 1
+            }
+
+            if (typeof hidden[i[0]][i[1] + 1] !== "undefined" && typeof hidden[i[0]][i[1] + 1] !== "string") {
+              hidden[i[0]][i[1] + 1] += 1
+            }
+          }
+
+          for (let i of bombs) {
+            hidden[i[0]][i[1]] = "b"
+          }
+
+          let grid = []
+          let r = []
+
+          for (let row=0; row < 10; row++) {
+            for (let column=0; column < 10; column++) {
+              r.push({selected: false, row: row, column: column, number: hidden[row][column], flagged: false, falseFlagged: false})
+            }
+            grid.push(r)
+            r=[]
+          }
+          return grid
+        }
+      }
+
+      ReactDOM.render(<Main />, document.getElementById('mydiv'))
+    </script>
+  </body>
+</html>
